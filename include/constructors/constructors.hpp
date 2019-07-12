@@ -8,7 +8,7 @@
 #define BIG_INT_CONSTRUCTORS_HPP
 
 #include "BigInt.hpp"
-#include "functions/utility.hpp"
+#include "utility/parse.hpp"
 
 
 /*
@@ -16,10 +16,7 @@
     -------------------
 */
 
-BigInt::BigInt() {
-    value = "0";
-    sign = '+';
-}
+BigInt::BigInt() : magnitude {}, is_negative(false) {}
 
 
 /*
@@ -27,23 +24,28 @@ BigInt::BigInt() {
     ----------------
 */
 
-BigInt::BigInt(const BigInt& num) {
-    value = num.value;
-    sign = num.sign;
+BigInt::BigInt(const BigInt& other) : magnitude(other.magnitude), is_negative(other.is_negative) {}
+
+
+/*
+    Move constructor
+    ----------------
+*/
+
+BigInt::BigInt(BigInt&& other) noexcept : magnitude(std::move(other.magnitude)), is_negative(other.is_negative) {
+    other.is_negative = false;
 }
 
 
 /*
-    Integer to BigInt
+    64 bit signed to BigInt
     -----------------
 */
 
-BigInt::BigInt(const long long& num) {
-    value = std::to_string(std::abs(num));
-    if (num < 0)
-        sign = '-';
-    else
-        sign = '+';
+BigInt::BigInt(const int64_t& num) : magnitude {}, is_negative(num < 0) {
+    // only add non zero
+    if (num)
+        magnitude.emplace_back(std::abs(num));
 }
 
 
@@ -52,27 +54,19 @@ BigInt::BigInt(const long long& num) {
     ----------------
 */
 
-BigInt::BigInt(const std::string& num) {
-    if (num[0] == '+' or num[0] == '-') {     // check for sign
-        std::string magnitude = num.substr(1);
-        if (is_valid_number(magnitude)) {
-            value = magnitude;
-            sign = num[0];
-        }
-        else {
-            throw std::invalid_argument("Expected an integer, got \'" + num + "\'");
-        }
-    }
-    else {      // if no sign is specified
-        if (is_valid_number(num)) {
-            value = num;
-            sign = '+';    // positive by default
-        }
-        else {
-            throw std::invalid_argument("Expected an integer, got \'" + num + "\'");
-        }
-    }
-    strip_leading_zeroes(value);
+BigInt::BigInt(const std::string& num) : magnitude{}, is_negative(false) {
+    parse_big_int(num, magnitude, is_negative);
+}
+
+
+/*
+    c-style String to BigInt
+    ----------------
+*/
+
+BigInt::BigInt(const char* str) : magnitude{}, is_negative(false) {
+    std::string num(str);
+    parse_big_int(num, magnitude, is_negative);
 }
 
 #endif  // BIG_INT_CONSTRUCTORS_HPP

@@ -4,27 +4,34 @@
     ===========================================================================
     Definition for the BigInt class.
 */
-
 #ifndef BIG_INT_HPP
 #define BIG_INT_HPP
 
 #include <iostream>
 
+#ifdef BIG_INT_TEST
+#define TEST_PRIVATE public
+#else
+#define TEST_PRIVATE private
+#endif
+
 class BigInt {
-    std::string value;
-    char sign;
+    TEST_PRIVATE:
+        std::vector<uint64_t> magnitude;
+        bool is_negative;
 
     public:
         // Constructors:
         BigInt();
         BigInt(const BigInt&);
-        BigInt(const long long&);
+        BigInt(BigInt&&) noexcept;
+        BigInt(const int64_t&);
         BigInt(const std::string&);
+        BigInt(const char*);
 
         // Assignment operators:
         BigInt& operator=(const BigInt&);
-        BigInt& operator=(const long long&);
-        BigInt& operator=(const std::string&);
+        BigInt& operator=(BigInt&&) noexcept;
 
         // Unary arithmetic operators:
         BigInt operator+() const;   // unary +

@@ -12,43 +12,33 @@
 
 
 /*
-    BigInt = BigInt
+
+    Copy assignment
     ---------------
 */
 
-BigInt& BigInt::operator=(const BigInt& num) {
-    value = num.value;
-    sign = num.sign;
+BigInt& BigInt::operator=(const BigInt& other) {
+    magnitude = other.magnitude;
+    is_negative = other.is_negative;
 
     return *this;
 }
 
 
 /*
-    BigInt = Integer
-    ----------------
-*/
 
-BigInt& BigInt::operator=(const long long& num) {
-    BigInt temp(num);
-    value = temp.value;
-    sign = temp.sign;
-
-    return *this;
-}
-
-
-/*
-    BigInt = String
+    Move assignment
     ---------------
 */
 
-BigInt& BigInt::operator=(const std::string& num) {
-    BigInt temp(num);
-    value = temp.value;
-    sign = temp.sign;
+BigInt& BigInt::operator=(BigInt&& other) noexcept {
+    magnitude = std::move(other.magnitude);
+    is_negative = other.is_negative;
+
+    other.is_negative = false;
 
     return *this;
 }
+
 
 #endif  // BIG_INT_ASSIGNMENT_OPERATORS_HPP
